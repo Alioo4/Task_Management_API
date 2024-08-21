@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users{
+  id           String @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullname     String @map("fullname") @db.VarChar(64)
+  phone        String @map("phote") @db.VarChar(64) @unique
+  password     String @map("password") @db.VarChar(64)
+  photo        String @map("photo") @db.VarChar(64)
+  createAt     DateTime @map("create_at") @default(now())
+
+  tasks Tasks[]
+
+  @@id([id])
+  @@map("users")
+}
+
+model Category{
+  id           String @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String @map("title") @db.VarChar(64)
+  photo        String @map("photo") @db.VarChar(64)
+  createAt     DateTime @map("create_at") @default(now())
+
+  tasks Tasks[]
+
+  @@id([id])
+  @@map("category")
+}
+
+model Tasks{
+  id           String @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String @map("title") @db.VarChar(64)
+  description  String @map("description") @db.Text
+  photo        String @map("photo") @db.VarChar(64)
+  DueDate      DateTime @map("due_date") 
+  priority     String @map("priority")
+  status       String @map("status")
+  userId       String @map("user_id") @db.Uuid
+  categoryId   String @map("category_id") @db.Uuid
+  createAt     DateTime @map("create_at") @default(now())
+
+  users Users @relation(fields: [userId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+
+
+  @@id([id])
+  @@map("tasks")
+}
